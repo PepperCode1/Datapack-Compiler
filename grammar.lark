@@ -1,0 +1,37 @@
+?start: code
+code: line*
+?block: "{" code "}"
+?line: ((create_variable | assign_variable | call_function | command)? ";") | if | while | function
+
+create_variable: TYPE " " CNAME ("=" expression)?
+assign_variable: CNAME ASSIGN_OPERATOR expression
+call_function: CNAME "(" (expression ("," expression)*)? ")"
+command: "/" /[^;\n]+/
+
+if: "if" "(" expression ")" block ("else" (" " if|block))?
+while: "while" "(" expression ")" block
+function: "def" CNAME "(" (arg ("," arg)*)? ")" block
+
+arg: TYPE " " CNAME
+expression: INTEGER | CNAME | "(" expression ")" | expression (MATH_OPERATOR | COMPARISON_OPERATOR | BOOLEAN_OPERATOR) expression | PREFIX_OPERATOR expression
+
+TYPE: "int"
+INTEGER: /-?[0-9]+/
+
+MATH_OPERATOR: "+"
+| "-"
+| "*"
+| "/"
+| "%"
+COMPARISON_OPERATOR: "=="
+| "!="
+| ((">"|"<") "="?)
+BOOLEAN_OPERATOR: "&&"
+| "||"
+PREFIX_OPERATOR: "!"
+| "-"
+ASSIGN_OPERATOR: MATH_OPERATOR? "="
+
+%import common.CNAME
+%import common.WS
+%ignore WS
